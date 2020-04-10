@@ -1,0 +1,85 @@
+\documentclass[12pt]{ociamthesis}  % default square logo 
+%\documentclass[12pt,beltcrest]{ociamthesis} % use old belt crest logo
+%\documentclass[12pt,shieldcrest]{ociamthesis} % use older shield crest logo
+
+%load any additional packages
+\usepackage{amssymb}
+\usepackage{subcaption}
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\usepackage[acronym]{glossaries}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[backend=biber,style=alphabetic,sortcites,backref,hyperref]{biblatex}
+
+\pagestyle{headings}
+
+\input{acronyms.tex}
+
+\bibliography{thesis}
+
+\title{Advances in\\[1ex]     %your thesis title,
+        Digital Research Repositories}   %note \\[1ex] is a line break in the title
+
+\author{Adrian-Tudor P\u{a}nescu}             %your name
+\college{Faculty of Automatic Control and Computer Engineering}  %your college
+
+%\renewcommand{\submittedtext}{change the default text here if needed}
+\degree{Doctor of Computer Science}     %the degree
+\degreedate{2019}         %the degree date
+
+\makeglossaries
+
+%end the preamble and start the document
+\begin{document}
+
+%this baselineskip gives sufficient line spacing for an examiner to easily
+%markup the thesis with comments
+\baselineskip=18pt plus1pt
+
+%set the number of sectioning levels that get number and appear in the contents
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+
+\maketitle                  % create a title page from the preamble info
+%\include{dedication}        % include a dedication.tex file
+\include{acknowlegements}   % include an acknowledgements.tex file
+\include{abstract}          % include the abstract
+
+\include{publications}
+
+\begin{romanpages}          % start roman page numbering
+\tableofcontents            % generate and include a table of contents
+%\listoffigures              % generate and include a list of figures
+\printglossary[type=\acronymtype,title=Abbreviations]
+
+\end{romanpages}            % end roman page numbering
+
+\chapter{Introduction}
+\label{ch:intro}
+\input{intro.tex}
+
+\chapter{From institutional to research repositories}
+\label{ch:evolution}
+\input{evolution.tex}
+
+\chapter{Linked data in research repositories}
+\label{ch:rdf}
+\input{rdf.tex}
+
+\chapter{Research dissemination, reuse, and licencing}
+
+\chapter{Research repository management and migration}
+
+\chapter{Final remarks}
+
+\printbibliography
+
+%now enable appendix numbering format and include any appendices
+%\appendix
+%\include{appendix1}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\renewcommand{\bibname}{References}
+
+\end{document}
