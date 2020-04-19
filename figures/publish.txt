@@ -1,0 +1,77 @@
+// version 1.0.2
+pragma solidity ^0.4.0;
+
+
+contract DatasetPublishReuse {
+
+    address datasetAuthor;
+    uint128 datasetHash;
+    uint128 datasetTermsHash;
+    address reuser;
+    uint128 workHash;
+
+
+    // event to be emitted  when a new dataset is published
+    event evDatasetPublished(
+        address _from,
+        uint128 _datasetHash,
+        uint128 _datasetTermsHash
+    );
+
+    // event to be emitted when an entity wishes to acquire a dataset for reuse
+    event evRequestDataset(
+        address _from,
+        uint128 _datesetHash
+    );
+
+    // event to be emitted when a dataset is released for reuse
+    event evDatasetReleased(
+        address _from,
+        address _to,
+        uint128 _datasetHash,
+        uint128 _datasetTermsHash
+    );
+
+    // event to be emitted when a work based on the original dataset is
+    // published
+    event evWorkPublished(
+        address _from,
+        uint128 _workHash,
+        uint128 _datasetHash,
+        uint128 _datasetTermsHash
+    );
+
+
+    function publishDataset(uint128 _datasetHash, uint128 _datasetTermsHash)
+    public returns (bool) {
+        datasetHash = _datasetHash;
+        datasetTermsHash = _datasetTermsHash;
+        datasetAuthor = msg.sender;
+        emit evDatasetPublished(datasetAuthor, datasetHash, datasetTermsHash);
+        return true;
+    }
+
+    function requestDataset(uint128 _datasetHash)
+    public returns (bool) {
+        assert(_datasetHash==datasetHash);
+        emit evRequestDataset(msg.sender, _datasetHash);
+        return true;
+    }
+
+    function releaseDataset()
+    public returns(bool) {
+        reuser = msg.sender;
+        emit evDatasetReleased(reuser, datasetAuthor,
+                               datasetHash, datasetTermsHash);
+        return true;
+    }
+
+    function publishRework(uint128 _workHash)
+    public returns (bool) {
+        assert(msg.sender==reuser);
+        workHash = _workHash;
+        emit evWorkPublished(reuser, workHash, datasetHash, datasetTermsHash);
+        return true;
+    }
+
+} // end contract
