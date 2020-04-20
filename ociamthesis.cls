@@ -36,6 +36,8 @@
 % The name of your Oxford college (e.g. Christ Church, Pembroke)
 \def\college#1{\gdef\@college{#1}}
 
+\def\advisor#1{\gdef\@advisor{#1}}
+
 
 %
 % Setup choosen crest/logo
@@ -102,12 +104,14 @@
   \begin{center}
     { \Huge {\bfseries {\@title}} \par}
 {\large \vspace*{40mm} {\logo \par} \vspace*{25mm}}
-    {{\Large \@author} \par}
-{\large \vspace*{1ex}
+    {{\Large\@author} \par}
+    \vspace*{2ex}
+    {{\Large Advised by \@advisor} \par}
+{\large \vspace*{4ex}
     {{\@college} \par}
 \vspace*{1ex}
     {Gheorghe Asachi Technical University of Ia\c{s}i \par}
-\vspace*{25mm}
+\vspace*{19mm}
     {{\submittedtext} \par}
 \vspace*{1ex}
     {\it {\@degree} \par}
