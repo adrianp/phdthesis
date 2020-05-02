@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{subcaption}
 \PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
-\usepackage{breakurl}
+%\usepackage{breakurl}
 \usepackage[acronym]{glossaries}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
@@ -72,7 +72,7 @@
 
 \chapter{Linked data in research repositories}
 \label{ch:rdf}
-\input{rdf.tex}
+%\input{rdf.tex}
 
 \chapter{Research repository management and migration}
 \label{ch:migration}
@@ -80,15 +80,14 @@
 
 \chapter{Final remarks}
 \label{ch:outro}
-\input{outro.tex}
-
-\printbibliography
+%\input{outro.tex}
 
 %now enable appendix numbering format and include any appendices
 %\appendix
 %\include{appendix1}
 
-\addcontentsline{toc}{chapter}{Bibliography}
+\addcontentsline{toc}{chapter}{References}
 \renewcommand{\bibname}{References}
+\printbibliography
 
 \end{document}
