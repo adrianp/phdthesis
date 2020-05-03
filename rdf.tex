@@ -1,101 +1,81 @@
-\subsection{Current implementation}
-\label{sec:curr}
+In Section \ref{sec:research} a case was made for adapting existing repositories to the realities of the current research ecosystem, which is characterised by a highly-distributed architecture; this enables bibliographic metadata to be routinely transferred between the systems that can best fulfil the functions required by the scientific venture, such as dissemination, preservation, discovery, or analysis. Adapting existing systems, instead of building new ones from the ground up is a preferred solution as, most often, software systems encapsulate a high degree of business logic which is undocumented externally and thus, cannot be easily replicated in new solutions. Furthermore, replacing repository solutions entails the migration of records from the old systems to the new ones, and this is generally undesirable as considerable effort needs to be spent in order to ensure the completeness and correctness of the corpus once the migration is completed.
 
-Currently, figshare holds all its metadata in a relational database \cite{figsupport}, with
-tables for each of the entities required for describing a record. The reasoning behind
-this choice includes the team's experience with relational systems, the extensive commercial
-support for such solutions, and the high availability and clustering options provided by
-these systems even before figshare's inception.
+When building new core functionality into existing systems, all parts of the architecture need to be considered in a bottom-top manner; as is the case with most software, in repositories the foundation is represented by the data model which is used to represent bibliographical metadata. As discussed in Section \ref{sec:data}, the metadata space can be quite complex, both due to the various schemas that can describe its syntax and the various vocabularies prescribing its semantics. Thus, in order to both bring repositories up-do-date with the current ecosystem and also ensure an acceptable degree of viability on the medium and long term, a data model which a high degree of flexibility needs to be built into the core of the system.
 
-While the current system continues to function well, certain shortcomings were observed
-when it came to implementing a number of features requested by figshare's users and customers; the two main requests that triggered the idea of using an RDF-based model are:
+\gls{rdf} is one such data model; the inception and evolution of \gls{rdf} is interlinked with the one of the \gls{www}, being fundamental in the newer concept of \emph{linked data}\footnote{\url{https://www.w3.org/standards/semanticweb/data}}. Withal, \gls{rdf} is defined as \emph{,,a standard model for data interchange on the Web''}\cite{rdf}. Its capabilities, that allow merging heterogeneous and continually-evolving data with little to no modifications required to the systems managing it, make it a good candidate for handling the complexity mentioned previously. 
 
-\begin{enumerate}
-\item Provide the ability to export metadata in various formats, both predefined in the system and defined ad hoc by end users. Currently, figshare allows exporting metadata in a fixed set of
-formats, both in its OAI-PMH interface and web application (see Fig. \ref{fig:figexport}), but this is
-lacking in both number of formats and the actual metadata which is available when exporting (e.g., almost all options do not contain information about the files pertaining to a record).
+\gls{rdf} concerns itself with creating links between disjoint entities, these relationships being called \emph{triples}. 
+A triple consists of a subject, a predicate, and an object; for example, in the statement ,,"RDF-Based Workflows for the
+Figshare Research Data Repository" is created by Adrian-Tudor P\u{a}nescu'' we have the title of a paper as the
+subject, \emph{is created} as the predicate, and the name of the first author as the object. Such triples can be visualised
+as directed graphs, such as the one in Fig. \ref{fig:graphinit}; as noted in this figure, \gls{rdf} uses \glspl{uri}
+to name both the vertices and the edges of this graph; the \glspl{uri} usually pertain to well-known vocabularies (or ontologies).
 
 \begin{figure}[thpb]
   \centering
   % fbox will add a border around the figure
-  \fbox{\includegraphics[scale=0.5]{figures/figshare_export.png}}
-  \caption{Formats exposed by figshare for exporting bibliographical information via its web interface.}
-  \label{fig:figexport}
+  \fbox{\includegraphics[scale=0.5]{figures/RDF_example.png}}
+  \caption{An RDF statement visualised as a directed graph using the Dublin Core Metadata Terms vocabulary to name its edge (\emph{dc}: is the prefix identifying this ontology). The subject of this statement should be an \gls{uri}, which would become available after publication in the form of a \gls{doi} for example; for brevity plain character strings were used for both the subject and object}
+  \label{fig:graphinit}
 \end{figure}
 
-\item Provide an easy mechanism for enhancing the main metadata set. Currently figshare allows
-institutional customers to define so-called \emph{custom metadata fields}, which extend the 
-main set to include information such as, but not limited to, geographical
-location information, retention dates, or archival markers; the interface for defining such fields
-is presented in Fig. \ref{fig:caf}. The main limitation of these fields is that they currently
-cannot be exported in any standard metadata format (e.g., via OAI-PMH) due to their lack of a
-proper \emph{definition}; for example, when defining a field for holding geographical location
-information, there is no mean of mentioning that this field follows the definition of the Dublin
-Core Metadata Terms \emph{spatial} one (URI: \nolinkurl{http://dublincore.org/documents/dcmi-terms/#terms-spatial}). This limitation is not only one of the user interface, but also of the application's data model, as the relational scheme is not easy to modify in order to accommodate all the possible definitions and configurations.
+Librarianship and repository research has considered the potential of \gls{rdf} and thus employed it for solving various issues in the space. The SciGraph project \cite{scigraph} built an RDF graph starting from Springer Nature journals' and articles' metadata, linked with external information such as institutional affiliations, funding bodies and research grants, citations and references, etc.  In \cite{ichim} the authors describe the model for an \gls{rdf} \emph{federation}, a system in which information from distinct repositories (in this case museum collections) is made available in a consolidated \gls{rdf} format.
 
-\begin{figure}[thpb]
-  \centering
-  % fbox will add a border around the figure
-  \fbox{\includegraphics[scale=0.4]{figures/field.png}}
-  \caption{Figshare interface that allows institutional clients to define custom metadata fields that can be filled in when creating a new record. Options for defining the type of the value (plain string, date field, etc.), certain validations, and guiding information are included.}
-  \label{fig:caf}
+The remaining of this chapter describes how an RDF model can be implemented in an existing data repository system, Figshare, in order to enhance its capabilities of ingesting, administering and disseminating records. This can allow it to support, besides research data, publications, thus achieving the vision of a comprehensive research repository. 
+
+Currently, Figshare holds all its metadata in a relational database, with tables for each of the entities required for describing a record. The reasoning behind this choice includes the team's experience with relational systems, the extensive commercial support for such solutions, and the high availability and clustering options provided by these systems even before Figshare's inception. While the current system continues to function well, certain shortcomings were observed when it came to implementing a number of features requested by Figshare's users; the two main requests that triggered the idea of using an RDF-based model are:
+
+\begin{enumerate}
+    \item Provide the ability to export metadata in various formats, both predefined in the system and defined ad hoc by end users. Currently, Figshare allows exporting metadata in a fixed set of formats, both in its \gls{oai}-\gls{pmh} interface and web application (see Fig. \ref{fig:figexport}), but this is lacking in both number of formats and the actual metadata which is available when exporting (e.g., almost all options do not contain information about the files pertaining to a record).
+
+    \begin{figure}[thpb]
+        \centering
+        \fbox{\includegraphics[scale=0.5]{figures/figshare_export.png}}
+        \caption{Formats exposed by Figshare for exporting bibliographical information via its web interface.}
+        \label{fig:figexport}
+    \end{figure}
+
+    \item Provide an easy mechanism for enhancing the main metadata field set. Currently Figshare allows institutional customers to define so-called \emph{custom metadata fields}, which can extend the main set to include information such as, but not limited to, geographical location information, retention dates, or archival markers; the interface for defining such fields is presented in Fig. \ref{fig:caf}. The main limitation of these fields is that they currently cannot be exported in any standard metadata format (e.g., via \gls{oai}-\gls{pmh}) due to their lack of a proper \emph{definition}; for example, when defining a field for holding geographical location information, there is no mean of mentioning that this field follows the definition of the gls{dcmt} \emph{spatial} one (URI: \nolinkurl{http://dublincore.org/documents/dcmi-terms/#terms-spatial}). This limitation is not only one of the user interface, but also of the application's data model, as the relational scheme is not easy to modify in order to accommodate all the possible definitions and configurations.
+
+    \begin{figure}[thpb]
+    \centering
+    \fbox{\includegraphics[scale=0.4]{figures/field.png}}
+    \caption{Figshare interface that allows institutional clients to define custom metadata fields that can be filled in when creating a new record. Options for defining the type of the value (plain string, date field, etc.), certain validations, and guiding information are included.}
+    \label{fig:caf}
 \end{figure}
 
 \end{enumerate}
 
-While exploring possible solutions to the issues above it became clear that implementing an RDF-based model and workflows would be beneficial not only for answering the two requirements, but also for creating an extensible system upon which various use-cases can build upon. The solution is described in the next subsection.
+While exploring possible solutions to the issues above it became clear that implementing an \gls{rdf}-based model and workflows would be beneficial not only for answering the two requirements, but also for creating an extensible system upon which various use-cases can build upon.
 
+The first challenge in building an RDF model relates to mapping all of Figshare's metadata fields, defined as columns in the relational model, to a well-defined ontology, vocabulary of terms; this is required in order to be able to properly identify the elements of the triples, as previously explained. In order to achieve this, either an established vocabulary or a custom one can be employed. In general, the first option is preferred as, among other, it avoids the \emph{not invented here} fallacy; moreover, this approach has already been explored by the \emph{figmeta} project\cite{figmeta}, and building upon it can speed up the development of an end-to-end solution.
 
-\subsection{Towards an RDF model}
-\label{sec:rdf}
+Figmeta employs the VIVO Core Ontology\footnote{\url{https://wiki.lyrasis.org/display/VIVO/The+core+ontology+and+its+annotations}}. For each column in the relational model, the field in the ontology which is the closest to Figshare's internal
+\emph{definition} of the column's contents can chosen; it is worth noting that finding an objective measure of how well this mapping is done is quite difficult as Figshare never provided an exact meaning for each of the columns in the relational model (or metadata fields it expects its records to have). By using these definitions, triples describing a Figshare record can be built, and these can be visualised in a graph such as the one in Fig. \ref{fig:graph}.
 
-The first challenge we need to overcome in building an RDF model is mapping all of figshare's metadata fields, defined as columns in the relational model, to a well-defined ontology, vocabulary of terms; this is required in order to
-be able to properly identify the elements of the triples, as previously explained. In order to achieve this, we can either provide our own definition for each attribute in the relational model and then publish the whole set along with the RDF graph, or use an established vocabulary. We chose the second option, in order to comply with figshare's stated mission to use well-known standards, and avoid the \emph{not invented here} fallacy; moreover, this approach has already been explored by the figmeta project \cite{figmeta}, and this would speed up the development of our end-to-end solution.
-
-Figmeta employs the VIVO Core Ontology \cite{vivo}. For each column in the relational model, the field in the ontology which is the closest to figshare's internal
-\emph{definition} of the column's contents was chosen; it is worth noting that finding an objective measure of how well this mapping was done is quite difficult as figshare never provided an
-exact meaning for each of the columns in the relational model (or metadata fields it expects its records to have). Having this ontology, triples describing a figshare item can be built,
-and these can be visualized in a graph such as the one in Fig. \ref{fig:graph}.
-
-\begin{figure*}[thpb]
+\begin{figure}[thpb]
   \centering
   % fbox will add a border around the figure
-  \fbox{\includegraphics[scale=0.35]{figures/rdf.png}}
-  \caption{A figshare item's RDF graph visualized. Vertices are subjects or objects, while edges are the predicates; edges are always directed from subject to object. The lower snapshot details one of the triples; the predicate is  from the BIBO ontology \cite{bibo}, used by VIVO, and associates the subject (a research record) with a Digital Object Identifier (DOI).}
+  \fbox{\includegraphics[scale=0.3]{figures/rdf.png}}
+  \caption{A Figshare record's RDF graph visualised. Vertices are subjects or objects, while edges are the predicates; edges are always directed from subject to object. The lower snapshot details one of the triples; the predicate is  from the BIBO (\url{http://bibliontology.com/}) ontology, used by VIVO, and associates the subject (a research record) with a \gls{doi}.}
   \label{fig:graph}
-\end{figure*}
+\end{figure}
 
-It is worth noting that this representation is already publicly available in the OAI-PMH interface, under
-the RDF \emph{format}.
+The second challenge relates to the definition of custom, user-defined metadata. While figmeta saved additional fields in a \gls{jsonld} (a  \gls{json} serialisation of RDF triples) data file of the record, another approach which embeds custom defined metadata in the original record
+model is proposed here. In order to achieve this, when defining a custom field, apart from the information presented in Fig. \ref{fig:caf}, the user is also requested to specify the ontology in which the field is defined (e.g., gls{dcmt}), and its name in this ontology (e.g., \emph{spatial}). This facilitates the inclusion of this new piece of information in the RDF graph; the predicate is composed of the term name and its ontology (e.g., \nolinkurl{http://dublincore.org/documents/dcmi-terms/#spatial}), and the object os the actual value, specified when the record is created. The subject, in the current configuration, is always the bibliographical record, but due to the flexibility of the RDF model it could become any other vertex in the graph (e.g., one of the attached files, or the author identifier).
 
-Our second challenge relates to the definition of custom, user-defined metadata. Here, we distance
-from the approach taken by figmeta, which saved additional fields in a JSON-LD (a JavaScript Object Notation serialization of RDF triples) data file of the
-record, by implementing an approach which embeds custom defined metadata in the original record
-model. In order to achieve this, when defining a custom field, apart from the information
-presented in Fig. \ref{fig:caf}, we also request the user to specify the ontology where the field
-is defined (e.g., Dublin Core Metadata Terms), and its name in this ontology (e.g., \emph{spatial}).
-This makes it very easy to include this new piece of information in the RDF graph; the predicate
-becomes the term name and its ontology (e.g., \nolinkurl{http://dublincore.org/documents/dcmi-terms/#spatial}),
-and the object the actual value, specified when the record is created. The subject, in the
-current configuration, is always the figshare item, but due to the flexibility of the RDF model
-it could become any other vertex in the graph (e.g., the file, or the author identifier).
+Apart from the flexibility, this approach also has the advantage that it considers all metadata fields to be \emph{equal}. In the relational model, where table structure cannot change frequently, the core metadata set is treated as a first-class citizen, while user defined metadata is lacking certain features; for example, Figshare's search system cannot fully query custom medatada fields (e.g., retrieve all records for which \emph{only} the \emph{spatial} field has the value \emph{``Appalachian Mountains''}. The aim here is to devise a uniform representation, where all fields require equal effort in terms of development when a certain functionality is considered.
 
-Apart from the flexibility, this approach also has the advantage that it considers all metadata
-to be equal. In the current relational model, where table structure cannot change so often, the
-core metadata set, which was defined by figshare, is treated as a first-class citizen, while user
-defined metadata is lacking certain features; for example, figshare's search system cannot fully search by the custom medatada fields (e.g., retrieve all records for which the \emph{spatial} field has the value ``Appalachian Mountains'', see the figshare search documentation at \cite{figsearch}). Our aim is to have a uniform representation, where all fields require equal effort in terms of development when a certain functionality is considered.
+The third considered challenge relates to the methods used for exporting metadata outside the repository. In the current model, this is done by implementing interfaces between the various aspects of the platform (\gls{oai}-\gls{pmh}, web interface, \gls{rest} \gls{api}) and the relational model; this can become cumbersome, because development time needs to be spent for each new export format, and, even more important, users cannot define their own preferred output.
 
-The third challenge we considered relates to the methods used for exporting metadata outside the figshare system. In the current model, this is done by implementing interfaces between the various aspects of the platform (OAI-PMH, web interface, RESTful API) and the relational model; this can become cumbersome, because for each new export format development time needs to be spent in order to provide it, and, even more important, users cannot define
-their own preferred output.
+\gls{rdf} graphs can be serialised in various forms, such as the already mentioned \gls{jsonld}, Turtle or N-Triples; the most popular one, nevertheless, is \gls{rdf}/\gls{xml}, which leverages the adoption of the \gls{xml} format and its ecosystem. As most of the formats currently expected by Figshare's users are \gls{xml}-based, this is a natural starting point; by setting up an \gls{rdf}/\gls{xml} serialisation of the
+graph it is straighforward to pivot to any other format by employing \gls{xslt}, a method for transforming \gls{xml} documents to other \gls{xml} representations.
 
-RDF graphs can be serialized in various forms, such as the already mentioned JSON-LD, Turtle or N-Triples; the most popular one, nevertheless, is RDF/XML, which leverages the adoption of the XML format and its ecosystem. As most of the formats currently expected by figshare's users are
-XML-based, we focused on this format, and noticed that starting from a RDF/XML serialization of our
-graph we could easily pivot to any other format by employing Extensile Language Stylesheet Transformations (XSLT), a method for transforming XML documents to other XML representations.
+Thus, for example, in order to get a \gls{dcmt} representation of a record modelled using \gls{rdf}, two steps need to be performed:
 
-Thus, for example, in order to get a Dublin Core Metadata Terms representation of a record modelled using RDF, two steps need to be performed:
 \begin{enumerate}
-\item Distil a RDF/XML serialization of the graph. Most RDF tools nowadays already include the means for this transformation, and thus, the development effort for this can be delegated to them.
-\item Perform an XSL transformation from the RDF/XML document to the Dublin Core Metadata Terms one; in order to do this a stylesheet as the one in Fig. \ref{lst:xslt} can be employed. Tools for performing the actual transformation are also wide-spread.
+    \item Distil a \gls{rdf}/\gls{xml} serialization of the graph. Most \gls{rdf} tools nowadays already include the means for this transformation, and thus, the development effort for this can be delegated to them.
+    \item Perform an \gls{xslt} operation from the \gls{rdf}/\gls{xml} document to the \gls{dcmt} one; in order to do this a stylesheet as the one in Fig. \ref{lst:xslt} can be employed. Tools for performing the actual transformation are also wide-spread.
 
 \begin{figure*}[!ht]
 \lstinputlisting[language=XML,
@@ -106,30 +86,28 @@ Thus, for example, in order to get a Dublin Core Metadata Terms representation o
                  showtabs=false,
                  stepnumber=2,
                  numbersep=4pt,
-                 basicstyle=\small]
+                 basicstyle=\fontsize{8}{7}\ttfamily]
   {figures/xslt.xml}
   \caption{Example XSL transformation for converting a RDF/XML document to Dublin Core Metadata Terms XML one.}
   \label{lst:xslt}
 \end{figure*}
 \end{enumerate}
 
-An important advantage of this approach is that, starting from the XML/RDF serialization we provide, users can define their own transformations. This offloads the development work and
-provides greater flexibility in terms of metadata output. The system also provides a solid
-base for developing other internal features; for example, Fig. \ref{fig:tind_search} presents the way in which the Invenio digital library platform \cite{invenio} can output search results in the Metadata Object Description Schema (MODS) format; as this is also
-an XML-based format, implementing the same functionality could be easily achieved via XSL transformations applied to RDF/XML.
+An important advantage of this approach is that, starting from the provided \gls{rdf}/\gls{xml} serialization, users can define their own transformations. This offloads the development work and provides greater flexibility in terms of metadata output. The system also provides a solid
+base for developing other internal features; for example, Fig. \ref{fig:tind_search} presents the way in which the Invenio digital library platform can output search results using the \gls{mods}\footnote{\url{http://www.loc.gov/standards/mods/}} schema; as this is also \gls{xml}-based format, implementing the same functionality could be easily achieved via \gls{xslt} applied to \gls{rdf}/\gls{xml}.
 
 \begin{figure*}[t]
   \centering
   % fbox will add a border around the figure
   \fbox{\includegraphics[scale=0.311]{figures/tind.png}}
-  \caption{Search results in MODS format as returned by the California Institute of Technology Library Catalog \cite{caltech}, a solution using the Invenio framework.}
+  \caption{Search results in \gls{mods} format as returned by the California Institute of Technology Library Catalog (\url{https://caltech.tind.io/?ln=en}), a solution based on the Invenio framework.}
   \label{fig:tind_search}
 \end{figure*}
 
-Nevertheless, our system does not need to be limited to the RDF/XML representation; JSON-LD becomes more popular nowadays, especially because the predominance of the JSON format across web
-applications, and RDF in Attributes (RDFa) starts being used by search engines for
-achieving a better understanding of the indexed web pages \cite{googleld}.
+Nevertheless, the system does not need to be limited to an \gls{rdf}/\gls{xml} representation; as \gls{jsonld} becomes more popular nowadays, especially due to the predominance of the \gls{json} format across web applications, \gls{rdfa} also starts being used by search engines for achieving a better understanding of the indexed web pages\cite{googleld}.
 
-%While a full implementation of the described system is not fully available, we provide a proof-of-concept one \cite{poc} which implements the uses-cases previously described and helped us understand the feasibility of the proposal and the ways in which we should proceed with the production-ready system. It is worth noting that for implementing the required operations we leveraged the RDFlib \cite{rdflib} and lxml \cite{lxml} Python libraries. 
+%After careful consideration, we reached the conclusion that completely replacing the relational model with the RDF one is not desirable, as, for example, we run the risk of loosing important business logic aspects. Instead, the two models can run in parallel, with the RDF one augmenting the current system. This, of course, will provide new challenges, such as maintaining the two sources of truth in sync while not limiting or hindering the operation of neither of them.
 
-After careful consideration, we reached the conclusion that completely replacing the relational model with the RDF one is not desirable, as, for example, we run the risk of loosing important business logic aspects. Instead, the two models can run in parallel, with the RDF one augmenting the current system. This, of course, will provide new challenges, such as maintaining the two sources of truth in sync while not limiting or hindering the operation of neither of them.
+%Given the third point, future work will focus on delivering the production-ready implementation to the figshare platform. First, this will require mapping the whole database model to either the VIVO ontology, or, if discovered as not sufficient, to another one. Second, all the RDF triples will need to be stored in either a triple-store, such as the one included in the Apache Jena suite \cite{jena}, or in a custom-built solution sitting on top of a classic graph database, such as Neo4j \cite{neo4j}.
+
+%With the technical endeavour completed, we will be able to better understand what other developments such a solution allows, both internally (figshare features that can benefit in their implementation from an RDF-based backend, e.g., metadata imports from other systems) and externally. On the second point, the most interesting development could be represented by the linking of figshare's data stored in the RDF graph to other similar structures, such as the Springer Nature SciGraph or The Linking Open Data Cloud \cite{lod}.

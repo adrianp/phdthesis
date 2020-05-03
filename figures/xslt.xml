@@ -8,12 +8,16 @@
   xmlns:ns5="http://www.w3.org/2006/vcard/ns#"
   exclude-result-prefixes="rdf rdfs ns1 ns2 ns5">
   <xsl:template match="/">
-    <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
-             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
-      <dc:title><xsl:value-of select="rdf:RDF/rdf:Description/rdfs:label" /></dc:title>
+    <oai_dc:dc 
+       xmlns:dc="http://purl.org/dc/elements/1.1/"
+       xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+      <dc:title>
+          <xsl:value-of select="rdf:RDF/rdf:Description/rdfs:label"/>
+      </dc:title>
       <xsl:for-each select="rdf:RDF/rdf:Description">
         <xsl:for-each select="ns5:hasName">
-          <dc:creator><xsl:value-of select="./@rdf:resource" /></dc:creator>
+          <dc:creator><xsl:value-of select="./@rdf:resource"/>
+          </dc:creator>
         </xsl:for-each>
       </xsl:for-each>
       <xsl:for-each select="rdf:RDF/rdf:Description">
@@ -21,9 +25,15 @@
           <dc:subject><xsl:value-of select="." /></dc:subject>
         </xsl:for-each>
       </xsl:for-each>
-      <dc:identifier><xsl:value-of select="rdf:RDF/rdf:Description/ns1:doi" /></dc:identifier>
-      <dc:rights><xsl:value-of select="rdf:RDF/rdf:Description/dc:rights" /></dc:rights>
-      <dc:spatial><xsl:value-of select="rdf:RDF/rdf:Description/dc:spatial" /></dc:spatial>
+      <dc:identifier>
+          <xsl:value-of select="rdf:RDF/rdf:Description/ns1:doi"/>
+      </dc:identifier>
+      <dc:rights>
+          <xsl:value-of select="rdf:RDF/rdf:Description/dc:rights"/>
+      </dc:rights>
+      <dc:spatial>
+          <xsl:value-of select="rdf:RDF/rdf:Description/dc:spatial"/>
+      </dc:spatial>
     </oai_dc:dc>
   </xsl:template> 
 </xsl:stylesheet>
