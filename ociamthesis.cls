@@ -11,9 +11,9 @@
 \DeclareOption{shieldcrest}{\def\logoversion{shieldcrest}}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions\relax
-\LoadClass[a4paper]{report}
+%\LoadClass[a4paper]{report}
 % As an alternative to the above could use next line for twosided output
-%\LoadClass[a4paper,twoside,openright]{report}
+\LoadClass[a4paper,twoside,openright]{report}
 
 \RequirePackage{graphicx} % needed for latest frontpage logo
 \RequirePackage{ifthen}   % needed for option parsing for logo
