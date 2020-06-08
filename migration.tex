@@ -1,6 +1,9 @@
 As discussed in Section \ref{sec:research} one of the possible paths for pivoting from pure publications or data repositories to research repositories consists of migrating records to a different system. Such a venture needs to be properly planned and executed in order to ensure, on one hand, that no records are lost or corrupted and, on the other hand, that minimal or no downtime is generated. Ideally, migrations would also be an opportunity to curate and enrich the existing corpus by consolidating and correcting bibliographic records. What differentiates such transfers from other data migrations is the required domain knowledge, the particularities of the target and source repositories in the context of the scholarly communications ecosystem, and the structure of the migration package, which includes, among others, bibliographic metadata, record files and usage data.
 
-In this chapter a workflow and technical framework for performing repository migrations is discussed, based on the experience of six such transfers performed between 2018 and 2019. These considered records stored on various repository solutions (DSpace, Bepress Digital Commons\footnote{\url{https://www.bepress.com/products/digital-commons/}}, custom in-house built systems) that had to be moved to the Figshare \gls{saas} repository platform. For this purpose, SLAM (Stateful  Library  Analysis  and  Migration), an \gls{etl} system was developed and successfully employed in order to migrate over $80.000$ records. 
+In this chapter a workflow and technical framework for performing repository migrations is discussed, based on the experience of six such transfers performed between 2018 and 2019. These considered records stored on various repository solutions (DSpace, Bepress Digital Commons), custom in-house built systems) that had to be moved to the Figshare \gls{saas} repository platform. For this purpose, SLAM (Stateful  Library  Analysis  and  Migration), an \gls{etl} system was developed and successfully employed in order to migrate over $80.000$ records. 
+
+\section{Background}
+\label{sec:migbackground}
 
 In early 2018 Figshare has started considering the suitability of its repository platform for storing, along with non-traditional research outputs (datasets or scientific software), content which is usually specific to \emph{institutional} repositories (journal articles, theses, monographs)\cite{fir}. While feature-wise this was validated by its hosted preprint servers\cite{chem}, a new challenge was posed, as clients choosing to use Figshare as an institutional repository also had to transfer all content from their existing systems.
 
@@ -21,6 +24,10 @@ Given that a number of five other migrations were to be completed between Octobe
 A number of repository migrations are present in the literature. In \cite{tragedy} the authors describe the process of moving from a DSpace to a Samvera\footnote{\url{https://samvera.org/}} system, while in \cite{challenges} the records were migrated from a solution developed in-house to DSpace. Both instances offer valuable insight into the challenges posed by digital library migrations, especially at the level of bibliographic metadata; on the other hand, both works are focused mostly on a specific use-case and do not propose general technical solutions for other migrations. It is interesting to note that the migration presented by \cite{tragedy} required $2.5$ years of work, while SLAM was employed to carry 5 migrations in 14 months.
 
 The Bridge2Hyku toolkit\cite{bridge} is a collection of tools, including a module for the Hyku repository solution\footnote{\url{https://hyku.samvera.org/}}, aimed at facilitating the import of records into digital libraries based on this software. Similar to SLAM, it includes an analysis component, useful for surfacing and correcting potential metadata issues during the migration. SLAM provides two major improvements over this solution, namely it defines a generic architecture that can be used for migrating records between any two repositories, while also defining a procedural migration workflow in order to create a robust, fault-tolerant and extensible solution.
+
+
+\section{SLAM: the Stateful  Library  Analysis  and  Migration framework}
+\label{sec:slam}
 
 Following the design principles mentioned previously, SLAM's architecture was devised as presented in Fig. \ref{fig:workflow}; as it is an \gls{etl} system, the easiest way of understanding its operation is by examining the data flow.
 
@@ -87,6 +94,10 @@ In the last step of SLAM's workflow the information that was used for the migrat
     \item Migration script state machine serialization.
 \end{itemize}
 This information is sufficient for understanding the exact steps applied during the migration and, if required, for applying certain corrections to the migrated records at a future point in time.
+
+
+\section{Evaluation of SLAM}
+\label{sec:eval}
 
 SLAM was used for performing five repository migrations during one year, as described in Table \ref{tbl:migrations}; the target repository in all five cases was Figshare. 
 \begin{table}[thpb]

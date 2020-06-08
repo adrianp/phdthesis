@@ -13,7 +13,10 @@ The first point above presents interest, as licencing and distribution is most o
 
 A particular blockchain technology, \emph{smart contracts} can approach these issues from a technological angle. They are a a protocol which allows to digitally facilitate, verify, or enforce the negotiation and performance of a contract. Initially introduced in 1996-1997\cite{szabo}, they came back into the spotlight along the other blockchain technologies as a mean of verifying various types of transactions. 
 
-The remaining of the chapter proposes a solution to research output licencing that uses smart contracts and blockchains to record dissemination and reuse actions; from a technology point of view, this solution uses three building blocks.
+The remaining of the chapter proposes a solution to research output licencing that uses smart contracts and blockchains to record dissemination and reuse actions; in the next section an overview of these technologies is included.
+
+\section{Blockchain technologies}
+\label{sec:blockchain}
 
 The first component, the blockchain, is a continuously growing list of records linked using cryptographically calculated values stored in each block. In its most popular implementation, Bitcoin, each block records the \emph{hash} value of the previous block, a timestamp, and data about multiple \emph{transactions} (algorithmic operations with one or more inputs and one or more outputs); such a list of transactions is called a \emph{ledger}. Most such systems are implemented as a peer-to-peer network, in which each node stores a full copy of the blockchain, thus removing the requirement for a central authority that needs to verify all transaction data; practically, such systems implement a distributed database in which consensus is achieved via the proof for validating the sequence of blocks.
 
@@ -21,7 +24,10 @@ Second, Ethereum is an open platform for building decentralized applications on 
 
 Last, at the core of the proposed solution stands the implementation of smart contracts in Ethereum. This platform includes two types of \emph{accounts}. \glspl{eoa} sre controlled usually by human actors via private cryptographic keys while contract accounts are controlled by the code to be ran on the virtual machines, which can be activated only by an externally owned account (for a more detailed explanation see \cite{ethdocs}. Contract accounts implement smart contracts, systems that usually contain value tokens that will be unlocked only if certain conditions are met. Solidity is an object-oriented, statically typed, high-level language used for implementing smart contracts on the Ethereum virtual machine\cite{solidity}. A contract in Solidity is defined, similar to a class in traditional object-oriented programming, as a collection of functions and data. The invocations of the functions, as well as a history of the values of the stored data, are stored in the underlying blockchain, making the execution of the smart contract fully traceable.
 
-Using these components the proposed solution for tracking digital rights enforcement over research outputs can be be built; for clarity we will assume the the shared research output is a dataset. First, the two types of accounts required by the Ethereum network need to be defined; there will be two externally \glspl{eoa}, one for the author that initially publishes the dataset, and one for the entity the wishes to reuse it. The contract account is associated to the smart contract code that will regulate reuse.
+\section{A smart contract for managing reuse rights of research data}
+\label{sec:smart}
+
+Using the previously described components the proposed solution for tracking digital rights enforcement over research outputs can be be built; for brevity it is assumed that the shared research output is a dataset. First, the two types of accounts required by the Ethereum network need to be defined; there will be two externally \glspl{eoa}, one for the author that initially publishes the dataset, and one for the entity the wishes to reuse it. The contract account is associated to the smart contract code that will regulate reuse.
 
 In terms of stored data, the following entities are considered:
 \begin{enumerate}
@@ -44,22 +50,23 @@ The smart contract will consist of three functions that need to be called in the
 
 These three functions describe how the smart contract should be developed and executed from a practical point of view, integrated with the current research workflows. As soon as a dataset is published, a version of the smart contract should be deployed and the first function should be called in order to record the terms under which the work can be reused. When there is a wish to access the dataset, the two parties (author and reuser) should come to an agreement on following these terms and record this on the blockchain by using the second function. The proof that the terms were actually followed will be recorded by calling the last function. A discussion on this last step relates to the entity that should call this operation; here it is considered that the reuser can do this, testifying that the established terms have been followed, and recording this in the permanent record of the blockchain. If this is deemed insufficient, an additional step can be added, in which the original author of the dataset, or any other suitable entity, verifies that terms were indeed obeyed, closing the execution of the contract.
 
-An implementation of the smart contract conceptually described above, using the Solidity language, is included in Fig. \ref{lst:solidity}.
+An implementation of the smart contract conceptually described above, using the Solidity language, is included in Listing \ref{lst:solidity}.
 
-\begin{figure}
+%\begin{figure}
 \lstinputlisting[language=C,
                  frame=tblr,
                  captionpos=b,
                  showspaces=false,
                  showstringspaces=false,
                  showtabs=false,
+                 breaklines=true,
                  stepnumber=2,
                  numbersep=4pt,
-                 basicstyle=\fontsize{8}{7}\ttfamily]
+                 basicstyle=\fontsize{8}{7}\ttfamily,
+                 caption=Solidity smart contract implementing the research data reuse terms management workflow.,
+                 label=lst:solidity]
   {figures/publish.txt}
-  \caption{Solidity smart contract implementing the research data reuse terms management workflow.}
-  \label{lst:solidity}
-\end{figure}
+%\end{figure}
 
 Two minor implementations details can be observed:
 \begin{itemize}

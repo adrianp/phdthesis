@@ -1,15 +1,12 @@
 // version 1.0.2
 pragma solidity ^0.4.0;
 
-
 contract DatasetPublishReuse {
-
     address datasetAuthor;
     uint128 datasetHash;
     uint128 datasetTermsHash;
     address reuser;
     uint128 workHash;
-
 
     // event to be emitted  when a new dataset is published
     event evDatasetPublished(
@@ -32,15 +29,13 @@ contract DatasetPublishReuse {
         uint128 _datasetTermsHash
     );
 
-    // event to be emitted when a work based on the original dataset is
-    // published
+    // event to be emitted when a work based on the original dataset is published
     event evWorkPublished(
         address _from,
         uint128 _workHash,
         uint128 _datasetHash,
         uint128 _datasetTermsHash
     );
-
 
     function publishDataset(uint128 _datasetHash, uint128 _datasetTermsHash)
     public returns (bool) {
@@ -73,5 +68,4 @@ contract DatasetPublishReuse {
         emit evWorkPublished(reuser, workHash, datasetHash, datasetTermsHash);
         return true;
     }
-
 } // end contract

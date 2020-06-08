@@ -2,7 +2,10 @@ In Section \ref{sec:research} a case was made for adapting existing repositories
 
 When building new core functionality into existing systems, all parts of the architecture need to be considered in a bottom-top manner; as is the case with most software, in repositories the foundation is represented by the data model which is used to represent bibliographical metadata. As discussed in Section \ref{sec:data}, the metadata space can be quite complex, both due to the various schemas that can describe its syntax and the various vocabularies prescribing its semantics. Thus, in order to both bring repositories up-do-date with the current ecosystem and also ensure an acceptable degree of viability on the medium and long term, a data model which a high degree of flexibility needs to be built into the core of the system.
 
-\gls{rdf} is one such data model; the inception and evolution of \gls{rdf} is interlinked with the one of the \gls{www}, being fundamental in the newer concept of \emph{linked data}\footnote{\url{https://www.w3.org/standards/semanticweb/data}}. Withal, \gls{rdf} is defined as \emph{,,a standard model for data interchange on the Web''}\cite{rdf}. Its capabilities, that allow merging heterogeneous and continually-evolving data with little to no modifications required to the systems managing it, make it a good candidate for handling the complexity mentioned previously. 
+\section{The Resource Description Framework (RDF) data model}
+\label{sec:rdf}
+
+\gls{rdf} is a model that can satisfy the mentioned requirements; the inception and evolution of \gls{rdf} is interlinked with the one of the \gls{www}, being fundamental in the newer concept of \emph{linked data}\footnote{\url{https://www.w3.org/standards/semanticweb/data}}. Withal, \gls{rdf} is defined as \emph{,,a standard model for data interchange on the Web''}\cite{rdf}. Its capabilities, that allow merging heterogeneous and continually-evolving data with little to no modifications required to the systems managing it, make it a good candidate for handling the complexity mentioned previously. 
 
 \gls{rdf} concerns itself with creating links between disjoint entities, these relationships being called \emph{triples}. 
 A triple consists of a subject, a predicate, and an object; for example, in the statement ,,"RDF-Based Workflows for the
@@ -22,6 +25,9 @@ to name both the vertices and the edges of this graph; the \glspl{uri} usually p
 Librarianship and repository research has considered the potential of \gls{rdf} and thus employed it for solving various issues in the space. The SciGraph project \cite{scigraph} built an RDF graph starting from Springer Nature journals' and articles' metadata, linked with external information such as institutional affiliations, funding bodies and research grants, citations and references, etc.  In \cite{ichim} the authors describe the model for an \gls{rdf} \emph{federation}, a system in which information from distinct repositories (in this case museum collections) is made available in a consolidated \gls{rdf} format.
 
 The remaining of this chapter describes how an RDF model can be implemented in an existing data repository system, Figshare, in order to enhance its capabilities of ingesting, administering and disseminating records. This can allow it to support, besides research data, publications, thus achieving the vision of a comprehensive research repository. 
+
+\section{From a relational model to RDF in a research repository}
+\label{sec:tordf}
 
 Currently, Figshare holds all its metadata in a relational database, with tables and columns for each of the entities required for describing a record. The reasoning behind this choice includes the team's experience with relational systems, the extensive commercial support for such solutions, and the high availability and clustering options provided by these systems even before Figshare's inception. While the current system continues to function well, certain shortcomings were observed when it came to implementing a number of features requested by Figshare's users; the two main requests that triggered the idea of using an RDF-based model are:
 
@@ -75,9 +81,8 @@ Thus, for example, in order to get a \gls{dcmt} representation of a record model
 
 \begin{enumerate}
     \item Distil a \gls{rdf}/\gls{xml} serialization of the graph. Most \gls{rdf} tools nowadays already include the means for this transformation, and thus, the development effort for this can be delegated to them.
-    \item Perform an \gls{xslt} operation from the \gls{rdf}/\gls{xml} document to the \gls{dcmt} one; in order to do this a stylesheet as the one in Fig. \ref{lst:xslt} can be employed. Tools for performing the actual transformation are also wide-spread.
+    \item Perform an \gls{xslt} operation from the \gls{rdf}/\gls{xml} document to the \gls{dcmt} one; in order to do this a stylesheet as the one in Listing \ref{lst:xslt} can be employed. Tools for performing the actual transformation are also wide-spread.
 
-\begin{figure*}[!ht]
 \lstinputlisting[language=XML,
                  frame=tblr,
                  captionpos=b,
@@ -86,11 +91,11 @@ Thus, for example, in order to get a \gls{dcmt} representation of a record model
                  showtabs=false,
                  stepnumber=2,
                  numbersep=4pt,
-                 basicstyle=\fontsize{8}{7}\ttfamily]
+                 basicstyle=\fontsize{8}{7}\ttfamily,
+                 caption=Example XSL transformation for converting a RDF/XML document to Dublin Core Metadata Terms XML one.,
+                 label=lst:xslt]
   {figures/xslt.xml}
-  \caption{Example XSL transformation for converting a RDF/XML document to Dublin Core Metadata Terms XML one.}
-  \label{lst:xslt}
-\end{figure*}
+
 \end{enumerate}
 
 An important advantage of this approach is that, starting from the provided \gls{rdf}/\gls{xml} serialization, users can define their own transformations. This offloads the development work and provides greater flexibility in terms of metadata output. The system also provides a solid
