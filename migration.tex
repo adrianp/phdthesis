@@ -2,6 +2,8 @@ As discussed in Section \ref{sec:research} one of the possible paths for pivotin
 
 In this chapter a workflow and technical framework for performing repository migrations is discussed, based on the experience of six such transfers performed between 2018 and 2019. These considered records stored on various repository solutions (DSpace, Bepress Digital Commons), custom in-house built systems) that had to be moved to the Figshare \gls{saas} repository platform. For this purpose, SLAM (Stateful  Library  Analysis  and  Migration), an \gls{etl} system was developed and successfully employed in order to migrate over $80.000$ records. 
 
+\newpage
+
 \section{Background}
 \label{sec:migbackground}
 
@@ -25,6 +27,7 @@ A number of repository migrations are present in the literature. In \cite{traged
 
 The Bridge2Hyku toolkit\cite{bridge} is a collection of tools, including a module for the Hyku repository solution\footnote{\url{https://hyku.samvera.org/}}, aimed at facilitating the import of records into digital libraries based on this software. Similar to SLAM, it includes an analysis component, useful for surfacing and correcting potential metadata issues during the migration. SLAM provides two major improvements over this solution, namely it defines a generic architecture that can be used for migrating records between any two repositories, while also defining a procedural migration workflow in order to create a robust, fault-tolerant and extensible solution.
 
+\newpage
 
 \section{SLAM: the Stateful  Library  Analysis  and  Migration framework}
 \label{sec:slam}

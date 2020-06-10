@@ -22,6 +22,7 @@ While this definition, including the distinction above, was proposed in 2003, it
 
 One way to look at this expansion is by considering an intermediate step between traditional institutional repositories and research repositories, namely repositories solely aimed at outputs outside the established publishing model; prime examples are data and research software repositories. Section \ref{sec:data} will take an in-depth look at data repositories while Section \ref{sec:research} will consider how data and institutional repositories merged, creating new systems which aim at managing any scholarly communications output.
 
+\newpage
 
 \section{Data repositories}
 \label{sec:data}
@@ -71,6 +72,8 @@ Large dataset instances, especially those exceeding one terabyte, might prove di
 In cases where a large number of files constitute a dataset it is important to describe the overall structure such that other applications or users can understand it. Traditionally, \emph{folders} are used for categorising and structuring content, but these can prove ineffective in describing the full organisation, and certain storage systems might not even implement this facility. A common solution to this issue is including separate file(s) describing the structure, usually called \emph{manifests}, along with the actual dataset files. Preferably these would follow a standard structure and semantics, and for this purpose standards such as BagIt\footnote{\url{https://tools.ietf.org/html/draft-kunze-bagit-16}} and \gls{mets}\footnote{\url{https://www.loc.gov/standards/mets/}} have been established. Along with the structural description, these files can also contain technical information (e.g., checksums) that might ease other processes along the scholarly workflow.
 
 An important distinction to consider, especially in the context of research repositories, is the one between storage and preservation. Preservation is a more involved process than simply ensuring that information is stored physically, being also concerned, as already alluded, with maintaining the integrity of the data, transforming it in order to ensure that it can still be consumed in line with the technological and social realities, and providing sufficient information on the data and its context such that new users can understand its purpose. All three points, and especially the latter, rely on \emph{metadata}, which documents various syntactic and semantic aspects of the underlying dataset; the next subsection provides a detailed description.
+
+\newpage
 
 \subsection{Metadata and identifiers}
 \label{subsec:metapids}
